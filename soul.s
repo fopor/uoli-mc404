@@ -1,7 +1,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @subcamada SOUL                          @
-@Autores: Focoder traficante de empada   @
-@         Romulo Oliveira                @
+@Autores: Rodrigo Ceccato de Freitas     @
+@          Felipe H. W. Pavan            @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 .set TIME_SZ 1000
@@ -9,7 +9,7 @@
 .set MAX_CALLBACKS 8
 .set DELAY_1 200000
 .set DELAY_2 300000
-.set FIM_VETOR_ALARMES, (VETOR_ALARMES + MAX_ALARMS*9)  @final do vetor de alarmes//se isso nao compilar, colocar no fim do código
+.set FIM_VETOR_ALARMES, (VETOR_ALARMES + MAX_ALARMS*9)  @final do vetor de alarmes//se isso nao compilar, colocar no fim do cÃ³digo
 
 .global read_sonar
 .global register_proximity_callback
@@ -164,21 +164,21 @@ SET_PILHAS:
     orr r0, r0, #0x0000001F          @muda para modo system (nao precisa de bitclear por ser 11111)
     msr cpsr_c, r0
     
-    ldr sp, =PILHA_USUARIO           @inicializa pilha modo system, pilha do usuário
+    ldr sp, =PILHA_USUARIO           @inicializa pilha modo system, pilha do usuÃ¡rio
     
     mrs r0, cpsr
     bic r0, r0, #0x0000001F          @bit clear nos bits de modo
-    orr r0, r0, #0x00000012          @muda para modo IRQ (interrupçoes de hardware)
+    orr r0, r0, #0x00000012          @muda para modo IRQ (interrupÃ§oes de hardware)
     msr cpsr_c, r0
     
     ldr sp, =PILHA_INTERRUPCAO       @inicializa pilha modo IRQ
     
     msr  cpsr_c, #0x10               @entra em modo usuario
     
-    @@FALAT TRANSFERIR EXECUÇÃO PARA APLICAÇÃO DE CONTROLE@@
+    @@FALAT TRANSFERIR EXECUÃ‡ÃƒO PARA APLICAÃ‡ÃƒO DE CONTROLE@@
     
-@tratamento de interrupções por hardware
-@a cada TIME_SZ o gpt gera uma interrupção
+@tratamento de interrupÃ§Ãµes por hardware
+@a cada TIME_SZ o gpt gera uma interrupÃ§Ã£o
 @incrementa o tempo e checa callbakcs e alarmes
 IRQ_HANDLER:
    
@@ -194,7 +194,7 @@ IRQ_HANDLER:
     add r1, r1, #1          @incrementa 1
     str r1, [r3]            @armazena o numero de interrupcoes
     
-    @checa se ja esta ocorrendo uma interrupção
+    @checa se ja esta ocorrendo uma interrupÃ§Ã£o
     ldr r0, =CHECANDO_CALLBACK
     ldr r1, [r0]
     cpm r1, #1
@@ -210,9 +210,9 @@ IRQ_HANDLER:
     
     ldr r4, =N_CALLBACKS
     ldr r4, [r4]                  @numero de callbacks ativas
-    ldr r5, =VETOR_CALLBACKS      @começo do vetor de callbacks
+    ldr r5, =VETOR_CALLBACKS      @comeÃ§o do vetor de callbacks
     mul r6, r4, #7                @quantidade de memoria ocupada pelas callback ativas
-    add r10, r5, r6               @ultima posição da ultima callback adicionada
+    add r10, r5, r6               @ultima posiÃ§Ã£o da ultima callback adicionada
     
     @indicando que esta checando as callbacks
     ldr r8, =CHECANDO_CALLBACK
@@ -221,8 +221,8 @@ IRQ_HANDLER:
     
 start_callback: 
     
-    @começo do loop de chacagem de callbacks   
-    @condição para o fim da checagem de callbacks
+    @comeÃ§o do loop de chacagem de callbacks   
+    @condiÃ§Ã£o para o fim da checagem de callbacks
     cmp r5, r10                    
     beq fim_callback
     
@@ -233,18 +233,18 @@ start_callback:
     cpm r1, r0
     bhi cont_callback             @caso onde limiar nao foi ultrapassado
     
-    @caso onde é necessario chamar a funçao da callback
+    @caso onde Ã© necessario chamar a funÃ§ao da callback
     
-    ldr r2, [r5, #3]              @endereço da função a ser chamada (4 bytes)
+    ldr r2, [r5, #3]              @endereÃ§o da funÃ§Ã£o a ser chamada (4 bytes)
     
-    @muda para modo usuario antes de chamar a função
+    @muda para modo usuario antes de chamar a funÃ§Ã£o
     
     mrs r0, cpsr
     bic r0, r0, #0x1F             @bitclear nos bits de modo
     orr r0, r0, #0x10     
     msr cpsr_c, r0                @entra em modo usuario
     
-    blx r2                        @chama função 
+    blx r2                        @chama funÃ§Ã£o 
     
     @muda para modo supervisor 
     mov r7, #23
@@ -252,7 +252,7 @@ start_callback:
 
 retorno_callback:
     
-    @coloca em modo interrução
+    @coloca em modo interruÃ§Ã£o
     mrs r0, cpsr
     bic r0, r0, #0x1F             @bitclear nos bits de modo
     orr r0, r0, #0x12             @entra em modo de IRQ
@@ -271,9 +271,9 @@ fim_callback:
     ldr r9, [r8]                  @indicando que acabou a checagem das callbacks
     
     
-    @começa a checar os alarmes
+    @comeÃ§a a checar os alarmes
     
-    ldr r4, =VETOR_ALARMES        @carrega começo
+    ldr r4, =VETOR_ALARMES        @carrega comeÃ§o
     ldr r5, =FIM_VETOR_ALARMES    @e fim do vetor de alarmes
     
     ldr r8, =CHECANDO_ALARME      @indicando que ja esta ocorrendo uma checagem de alarmes
@@ -281,7 +281,7 @@ fim_callback:
     ldr r9, [r8]   
 
 start_alarme: 
-    @condição para o fim da checagem de alarmes
+    @condiÃ§Ã£o para o fim da checagem de alarmes
     
     cpm r4, r5
     beq fim_alarme 
@@ -303,16 +303,16 @@ start_alarme:
     mov r0, #0
     str r0, [r4]            @seta o alarme como inativo
     
-    @entra em modo usuario para chamar a função 
+    @entra em modo usuario para chamar a funÃ§Ã£o 
     
-    ldr r2, [r4, #1]        @pega endereço da função a ser chamada
+    ldr r2, [r4, #1]        @pega endereÃ§o da funÃ§Ã£o a ser chamada
     
     mrs r0, cpsr
     bic r0, r0, #0x1F       @bitclear nos bits de modo
     orr r0, r0, #0x10     
     msr cpsr_c, r0          @entra em modo usuario
     
-    blx r2                  @chama a função
+    blx r2                  @chama a funÃ§Ã£o
     
     @voltando para o modo supervisor
     mov r7, #23        
@@ -346,7 +346,7 @@ fim_irq:
     sub lr, lr, #4
     movs pc, lr
     
-@tratamento de interrupções de software
+@tratamento de interrupÃ§Ãµes de software
 SUPERVISOR_HANDLER:
     
     @@@@@ TEM QUE PEGAR OS PARAMETROS DAS SYSCALL DA PILHA AQUI? @@@@           
@@ -419,7 +419,7 @@ read_sonar:
     ldr r6, =0x0000003C
     ldr r8, =0xFFFFFFFD        
     bic r5, r5, r6            @bitclear nos bits de sonar_mux[0-3] 
-    r0, lsl #2                @arruma posição dos bits do identificador
+    r0, lsl #2                @arruma posiÃ§Ã£o dos bits do identificador
     orr r5, r5, r0            @coloca os bits do identificador em sonar_mux[0-3] e mantem os outros
     and r5, r5, r8            @coloca 0 no trigger e mantem os outros
     str r5, [r4, #GPIO_DR]    
@@ -476,7 +476,7 @@ READ:
     ldr r5, [r4, #GPIO_DR]
     ldr r6, =0x0003FFC0
     and r5, r5, r6
-    r5, lsr #6            @coloca os bits na posição correta para se tornar o valor da distancia
+    r5, lsr #6            @coloca os bits na posiÃ§Ã£o correta para se tornar o valor da distancia
     
     @coloca o valor lido em r0 e retorna da rotina
     mov r0, r5
@@ -540,12 +540,12 @@ set_motor_speed:
 
     stmfd sp!,{r4-r6, r8, lr}
     
-    @checa se velocidade requerida é valida
+    @checa se velocidade requerida Ã© valida
     cmp r1, #63
     movhs r0, #-2                @caso invalida retorna -2 em r0
     ldmhsfd sp!,{r4-r6, r8, pc}
     
-    @checa se identificador é valido
+    @checa se identificador Ã© valido
     cmp     r0, #2
     movhs   r0, #-1
     ldmhsfd sp!,{r4-r6, r8, pc}  @caso invalido retorna -1 em r0
@@ -557,12 +557,12 @@ set_motor_speed:
     
     cmp r0, #1                @determinando qual motor sera mudado
     beq motor1
-    r0, lsl #19               @muda posição dos bits para o caso do motor0 
+    r0, lsl #19               @muda posiÃ§Ã£o dos bits para o caso do motor0 
     orr r5, r5, #0x02000000   @coloca 1 no bit para motor0_write
     str r5, [r4, #GPIO_DR]    
     ldr r6, =0x01F80000
-    bic r5, r5, r6            @bitclear nas posiçoes que irao receber os bits da velocidade
-    orr r5, r5, r0            @coloca os bits da nova velocidade nas posições corretas
+    bic r5, r5, r6            @bitclear nas posiÃ§oes que irao receber os bits da velocidade
+    orr r5, r5, r0            @coloca os bits da nova velocidade nas posiÃ§Ãµes corretas
     b fim
 
 motor1:
@@ -571,8 +571,8 @@ motor1:
     orr r5, r5, #0x00040000   @colcoa 1 no bit para motor1_write
     str r5, [r4, #GPIO_DR]    
     ldr r6, =0xFC000000
-    bic r5, r5, r6            @bitclear nas posiçoes que irao receber os bits da velocidade
-    orr r5, r5, r0            @coloca os bits da nova velocidade nas posições corretas
+    bic r5, r5, r6            @bitclear nas posiÃ§oes que irao receber os bits da velocidade
+    orr r5, r5, r0            @coloca os bits da nova velocidade nas posiÃ§Ãµes corretas
     
 fim:
     
@@ -597,7 +597,7 @@ set_motors_speed:
     stmfd sp!,{r4-r6, r8, lr}
     
     
-    @checa se velocidades são validas
+    @checa se velocidades sÃ£o validas
     cmp r0, #63
     movhs r0, #-2                @caso invalida retorna -2 em r0
     ldmhsfd sp!,{r4-r6, r8, pc}
@@ -606,7 +606,7 @@ set_motors_speed:
     movhs r0, #-2                @caso invalida retorna -2 em r0
     ldmhsfd sp!,{r4-r6, r8, pc}
     
-    ldr r4, =GPIO_BASE           @carrega endereço base do GPIO
+    ldr r4, =GPIO_BASE           @carrega endereÃ§o base do GPIO
     
     @prepara para a escrita 
     ldr r5, [r4, #GPIO_DR]       @carrega estado atual do data register
@@ -618,11 +618,11 @@ set_motors_speed:
     
     mov r6, #0
     orr r6, r6, r0         
-    orr r6, r6, r1               @registrador com as duas velocidades nas respectivas posiçoes
+    orr r6, r6, r1               @registrador com as duas velocidades nas respectivas posiÃ§oes
     
     ldr r5, [r4, #GPIO_DR]  
     ldr r8, =0xFDF80000          @1 nos bits das velocidades(MotorX_speed[0-5])
-    bic r5, r5, r8               @bitclear nas posições de DR que vao receber os bits da velocidade
+    bic r5, r5, r8               @bitclear nas posiÃ§Ãµes de DR que vao receber os bits da velocidade
     orr r5, r5, r6               @coloca os bits das novas velocidades em r5    
     str r5, [r4, #GPIO_DR]       @atualiza DR com as novas velocidades
     
@@ -748,7 +748,7 @@ SYS_TIME: .word 0             @contador de tempo de sistema
 
 N_ALARMES: .word 0            @contador do numero de alarmes
 
-VETOR_ALARMES:   .skip MAX_ALARMS * 9 @aloca espaço para o numero maximo de alarmes  
+VETOR_ALARMES:   .skip MAX_ALARMS * 9 @aloca espaÃ§o para o numero maximo de alarmes  
 
 N_CALLBACKS: .word 0          @contador do numero de callbacks
 
@@ -758,14 +758,14 @@ VETOR_CALLBACKS:    .skip MAX_CALLBACKS * 7
 @fica ativo ate o final do programa
 @assim como sabe qauqleur pessoa que leu com atencao o enunciado 
 
-PILHA_SUPERVISOR: .skip 50    @aloca espaço para a pilha do modo supervisor
+PILHA_SUPERVISOR: .skip 50    @aloca espaÃ§o para a pilha do modo supervisor
 
-PILHA_USUARIO: .skip 50       @aloca espaço para a pilha do modo usuario
+PILHA_USUARIO: .skip 50       @aloca espaÃ§o para a pilha do modo usuario
 
-PILHA_INTERRUPCAO: .skip 50   @aloca espaço para a pilha durante interrupção
+PILHA_INTERRUPCAO: .skip 50   @aloca espaÃ§o para a pilha durante interrupÃ§Ã£o
 
 CHECANDO_ALARME: .word 0
 
 CHECANDO_CALLBACK: .word 0
 
-@os cara guarda as palavra né
+@os cara guarda as palavra nÃ©
